@@ -6,10 +6,16 @@ interface SearchProps {
   onSearch: (query: string) => void;
   placeholder?: string;
   className?: string;
+  value?: string;
 }
 
-export const Search = ({ onSearch, placeholder = "Search products...", className = "" }: SearchProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
+export const Search = ({ onSearch, placeholder = "Search products...", className = "", value = "" }: SearchProps) => {
+  const [searchQuery, setSearchQuery] = useState(value);
+
+  // Update internal state when external value changes
+  useEffect(() => {
+    setSearchQuery(value);
+  }, [value]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

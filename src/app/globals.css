@@ -135,6 +135,19 @@ html {
   color: white;
 }
 
+/* Search input text selection */
+input[type="text"]::selection,
+input[type="search"]::selection {
+  background: #dbeafe;
+  color: #000000;
+}
+
+input[type="text"]::-moz-selection,
+input[type="search"]::-moz-selection {
+  background: #dbeafe;
+  color: #000000;
+}
+
 /* Loading animation */
 .loading-dots {
   display: inline-block;
