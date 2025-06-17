@@ -38,7 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="ltr" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="antialiased bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+      <body 
+        className="antialiased bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen"
+        suppressHydrationWarning={true}
+      >
         <CartProvider>
           <div className="flex flex-col min-h-screen">
             <Header />

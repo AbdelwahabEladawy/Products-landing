@@ -100,7 +100,7 @@ export default function HomePage() {
                   className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
                 >
                   <Filter size={18} />
-                  Filter
+                  Filter by Price
                 </button>
               </div>
             </div>
