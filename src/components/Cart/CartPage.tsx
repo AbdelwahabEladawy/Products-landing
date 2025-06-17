@@ -10,6 +10,16 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import toast from "react-hot-toast";
 
+interface CartItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  quantity: number;
+}
+
 export default function CartPage() {
   const { items, removeFromCart, clearCart, totalItems, totalPrice, increaseQuantity, decreaseQuantity } = useCartContext();
   
@@ -66,7 +76,7 @@ export default function CartPage() {
     setModalConfig(prev => ({ ...prev, isOpen: false }));
   };
 
-  const handleDecreaseQuantity = (item: any) => {
+  const handleDecreaseQuantity = (item: CartItem) => {
     if (item.quantity === 1) {
       showModal(
         "Remove Item",
@@ -82,7 +92,7 @@ export default function CartPage() {
     }
   };
 
-  const handleIncreaseQuantity = (item: any) => {
+  const handleIncreaseQuantity = (item: CartItem) => {
     increaseQuantity(item.id);
     toast.success(`Quantity updated for ${item.name}! 📦`);
   };
