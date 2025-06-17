@@ -1,103 +1,132 @@
-import Image from "next/image";
+"use client"
+import { useState, useMemo } from "react";
+import ProductList from "@/components/Product/ProductList";
+import { Search } from "@/components/UI/Search";
+import { Filter } from "@/components/UI/Filter";
+import { products } from "@/Data/products";
 
-export default function Home() {
+export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 999 });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Calculate max price from products
+  const maxPrice = Math.max(...products.map(p => p.price));
+
+  // Filter products based on search and price
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = product.category.toUpperCase().includes(searchQuery.toUpperCase());
+      const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
+      
+      return matchesSearch && matchesPrice;
+    });
+  }, [searchQuery, priceRange]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleFilter = (min: number, max: number) => {
+    setPriceRange({ min, max });
+  };
+
+  // Check if there's an active search or filter
+  const hasActiveFilters = searchQuery || priceRange.min > 0 || priceRange.max < maxPrice;
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl pb-2 font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Discover Amazing Products
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Explore our curated collection of high-quality products at unbeatable prices
+            </p>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {/* Search and Filter Section */}
+          <div className="mb-8">
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <div className="flex flex-col lg:flex-row gap-4 items-center">
+                {/* Search Bar */}
+                <div className="flex-1 w-full">
+                  <Search onSearch={handleSearch} placeholder="Search by category..." />
+                </div>
+                
+                {/* Filter Button */}
+                <button
+                  onClick={() => setIsFilterOpen(true)}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+                >
+                  🔍 Filter
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Results Summary - Only show when there's active search or filter */}
+          {hasActiveFilters && (
+            <div className="mb-8">
+              <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-semibold text-gray-800">
+                      {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      (filtered from {products.length} total)
+                    </span>
+                  </div>
+                  
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setPriceRange({ min: 0, max: maxPrice });
+                    }}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* No Results Message */}
+          {hasActiveFilters && filteredProducts.length === 0 && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-2xl font-bold text-gray-700 mb-2">No products found</h3>
+              <p className="text-gray-500 mb-4">No products match your search criteria.</p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setPriceRange({ min: 0, max: maxPrice });
+                }}
+                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+
+          {/* Products */}
+          {(!hasActiveFilters || filteredProducts.length > 0) && (
+            <ProductList products={filteredProducts} />
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+      {/* Filter Modal */}
+      <Filter
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onFilter={handleFilter}
+        maxPrice={maxPrice}
+      />
+    </>
   );
 }
